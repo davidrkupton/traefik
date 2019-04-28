@@ -118,6 +118,8 @@ defaultEntryPoints = ["http", "https"]
   #
   # dashboard = false
 
+[ping]
+
 ################################################################
 # Docker configuration backend
 ################################################################

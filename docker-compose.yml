@@ -12,7 +12,7 @@ services:
       - ./scripts:/helpers
       - ./scripts/add-cert.sh:/scripts/add-cert.sh
       - ./scripts/refresh-certs.sh:/scripts/refresh-certs.sh
-    command: --api --docker TLS:/certs/cert.crt,/certs/cert.key --logLevel=DEBUG --web
+    command: --api --docker --ping --entrypoints=Name:https Address::443 TLS:/certs/cert.crt,/certs/cert.key --logLevel=DEBUG --web
     entrypoint:
       - /traefik
     expose:
@@ -25,3 +25,8 @@ services:
     restart: always
     environment:
       PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    healthcheck:
+      test: /traefik healthcheck
+      interval: 30s
+      timeout: 10s
+      retries: 5
