@@ -1,0 +1,27 @@
+version: '3.2'
+
+volumes:
+
+services:
+  reverse-proxy:
+    image: traefik:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp
+      - /dev/null:/traefik.toml
+      - ./scripts:/helpers
+      - ./scripts/add-cert.sh:/scripts/add-cert.sh
+      - ./scripts/refresh-certs.sh:/scripts/refresh-certs.sh
+    command: --api --docker TLS:/certs/cert.crt,/certs/cert.key --logLevel=DEBUG --web
+    entrypoint:
+      - /traefik
+    expose:
+      - 80
+      - 443
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    restart: always
+    environment:
+      PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
