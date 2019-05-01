@@ -1,10 +1,8 @@
 version: '3.2'
 
-volumes:
-
 services:
   reverse-proxy:
-    image: traefik:latest
+    image: traefik:alpine
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp
@@ -12,9 +10,7 @@ services:
       - ./scripts:/helpers
       - ./scripts/add-cert.sh:/scripts/add-cert.sh
       - ./scripts/refresh-certs.sh:/scripts/refresh-certs.sh
-    command: --api --docker --ping --entrypoints=Name:https Address::443 TLS:/certs/cert.crt,/certs/cert.key --logLevel=DEBUG --web
-    entrypoint:
-      - /traefik
+    command: --api --docker --ping --logLevel=DEBUG --web
     expose:
       - 80
       - 443
@@ -26,7 +22,7 @@ services:
     environment:
       PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     healthcheck:
-      test: /traefik healthcheck
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
       interval: 30s
       timeout: 10s
       retries: 5
