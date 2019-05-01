@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   reverse-proxy:
-    image: traefik:alpine
+    image: traefik:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp
@@ -22,7 +22,7 @@ services:
     environment:
       PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     healthcheck:
-      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      test: ["CMD", "/traefik", "healthcheck", "--ping"]
       interval: 30s
       timeout: 10s
       retries: 5
