@@ -7,14 +7,14 @@
 # Optional
 # Default: false
 #
-# debug = true
+debug = true
 
 # Log level
 #
 # Optional
 # Default: "ERROR"
 #
-# logLevel = "DEBUG"
+logLevel = "DEBUG"
 
 # Entrypoints to be used by frontends that do not specify any entrypoint.
 # Each frontend can specify its own entrypoints.
@@ -33,16 +33,29 @@ defaultEntryPoints = ["http", "https"]
 # Optional
 # Default:
 [entryPoints]
+    [entrypoints.dashboard]
+#      address = ":8080"
+    [entrypoints.dashboard.auth]
+      [entrypoints.dashboard.auth.basic]
+        users = ["admin:$apr1$zoUUWtcj$yyjeXDC4dUOaKs/l0KHbD."]
     [entryPoints.http]
-    address = ":80"
+      address = ":80"
         [entryPoints.http.redirect]
         entryPoint = "https"
     [entryPoints.https]
-    address = ":443"
-    [entryPoints.https.tls]
-      [[entryPoints.https.tls.certificates]]
-      certFile = "examples/traefik.crt"
-      keyFile = "examples/traefik.key"
+      address = ":443"
+        [entryPoints.https.tls]
+#      [[entryPoints.https.tls.certificates]]
+#      certFile = "examples/traefik.crt"
+#      keyFile = "examples/traefik.key"
+
+[acme]
+email = "david@the-uptons.com"
+storage = "acme.json"
+entrypoint = "https"
+onHostRule = true
+    [acme.httpChallenge]
+    entrypoint = "http"
 
 ################################################################
 # Traefik logs configuration
@@ -103,7 +116,7 @@ defaultEntryPoints = ["http", "https"]
 
 # Enable API and dashboard
 [api]
-
+  entrypoints="dashboard"
   # Name of the related entry point
   #
   # Optional
@@ -132,7 +145,6 @@ defaultEntryPoints = ["http", "https"]
 # Required
 # Default: "unix:///var/run/docker.sock"
 #
-endpoint = "unix:///var/run/docker.sock"
 
 # Default domain used.
 # Can be overridden by setting the "traefik.domain" label on a container.
@@ -147,7 +159,7 @@ domain = "the-uptons.com"
 # Optional
 # Default: true
 #
-exposedByDefault = true
+exposedByDefault = false
 
 # Use the IP address from the binded port instead of the inner network one.
 #
@@ -178,7 +190,9 @@ swarmModeRefreshSeconds = 15
 #
 # Optional
 #
-network = "bridge"
+network = "traefik_default"
+
+watch = true
 
 # Enable docker TLS connection.
 #
@@ -186,6 +200,6 @@ network = "bridge"
 #
   [docker.tls]
 #  ca = "/etc/ssl/ca.crt"
-  cert = "/etc/ssl/docker.crt"
-  key = "/etc/ssl/docker.key"
+#  cert = "/etc/ssl/docker.crt"
+#  key = "/etc/ssl/docker.key"
 #  insecureSkipVerify = true

@@ -2,15 +2,20 @@ version: '3.2'
 
 services:
   reverse-proxy:
-    image: traefik:alpine
+    image: traefik:latest
+    build:
+      context: .
+      dockerfile: dockerfile
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp
-      - /dev/null:/traefik.toml
+      - ./scripts/traefik.toml:/traefik.toml
+      - ./acme.json:/acme.json
       - ./scripts:/helpers
       - ./scripts/add-cert.sh:/scripts/add-cert.sh
       - ./scripts/refresh-certs.sh:/scripts/refresh-certs.sh
-    command: --api --docker --ping --logLevel=DEBUG --web
+    command: --api --docker --ping --web
+    restart: always
     expose:
       - 80
       - 443
@@ -18,11 +23,13 @@ services:
       - 80:80
       - 443:443
       - 8080:8080
-    restart: always
+    labels:
+      - traefik.frontend.rule=Host:monitor.the-uptons.com
+      - traefik.port=8080
     environment:
       PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     healthcheck:
-      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      test: ["CMD", "/traefik", "healthcheck", "--ping"]
       interval: 30s
       timeout: 10s
       retries: 5
